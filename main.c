@@ -13,12 +13,13 @@
 #include "ran1.c"
 
 int
-main ()
+main (int argc, char *argv[])
 {
   FILE *input, *output;
   FILE *out_incoming, *out_absorbed, *out_emitted, *out_detected, *out_depth;
     //*out_loop;
   //double x_dim, y_dim, z_dim;
+  const unsigned int commandlineargs=7; //including name of program
   double *spec_x, *spec_y, *spec_y2;
   double *abs_x, *abs_y, *abs_y2;
   double *emi_x, *emi_y, *emi_y2;
@@ -36,14 +37,14 @@ main ()
   int i, j, h, abs;// trp, wfg, 
   int N_phot;// N_curr, W_curr;
   long k = (short)time(NULL);//seed random number generator using the time
-	printf("Random seed %d\n",k);
+	//printf("Random seed %ld\n",k);
 
   //int reabs;
   int spec_N, abs_N, emi_N;// alive, out, cheat;
   int bin_N, *depth_bin, *reabs_bin, BR = 1, LA = 1, iterate;
   int reabsorptioncycles = 5; //number of loops over the reabsorption calculator: recommend 5
 
-  bin_N = 1e2;//laszlo recomends 1e5, but make sure bin size is << absorption length
+  bin_N = 1e1;//laszlo recomends 1e5, but make sure bin size is << absorption length
   depth_bin = ivector (1, bin_N);
   reabs_bin = ivector (1, bin_N);
   new_reabs_bin = dvector (1, bin_N);
@@ -104,21 +105,27 @@ main ()
   spline (emi_x, emi_y, emi_N, 1e30, 1e30, emi_y2);
 //end set up emission spectrum
 
-/*input = fopen("input.txt","r");
-fscanf(input,"%lf",&x_dim);
-fscanf(input,"%lf",&y_dim);
-fscanf(input,"%lf",&z_dim);
-fscanf(input,"%lf",&Phi_F);
-fscanf(input,"%lf",&c);
-fscanf(input,"%lf",&ratio);
-fscanf(input,"%lf",&n);
-fscanf(input,"%lf",&thresh);
-fscanf(input,"%lf",&stokes);
-fscanf(input,"%lf",&shift);
-
-G = x_dim*y_dim/(2*z_dim*y_dim + 2*z_dim*x_dim);
-d = z_dim;
-fclose(input);*/
+//Get command line arguments
+  if(argc!=commandlineargs)
+  {//test number of arguments
+	printf("Wrong number of command line arguments\n");
+	exit(-1);
+  }
+  printf("%s\n",argv[1]);
+/*
+  bin_N = ;			//number of bins
+  d = ; //depth of the cell
+  k1 = ;			//triplet nonradiative decay
+  k2 = ;			//annihilation rate cm3/s 1.7e-13 for rubrene
+  eta_c = ;			//proportion of annihilation events which lead to the singlet state
+  d = ;			//thickness in cm //only used if the for loop is disabled
+  c = ;			//concentration of sensitizer
+  C = ;			//solar concentration factor
+*/
+  for(i=1;i<=commandlineargs;i++)
+  {
+	printf("%d\n",i);
+  }
 
   abs = 0;
   esc = 0;
@@ -154,12 +161,13 @@ fclose(input);*/
   T = 1.0;			//solar cell/front surface transparency
   k1 = 1e4;			//triplet nonradiative decay
   k2 = 1.7e-12;			//annihilation rate cm3/s 1.7e-13 for rubrene
+  d = 0.01; //depth of the cell
 
 
   //out_loop = fopen ("looper.dat", "w");
   //
   //loop over depth
-  for (d = 0.0001; d <= .01; d *= 10)
+  //for (d = 0.0001; d <= .01; d *= 10)
     {
       total_energy = 0.0;
       for (i = 1; i <= bin_N; i++)
