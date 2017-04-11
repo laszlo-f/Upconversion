@@ -44,10 +44,6 @@ main (int argc, char *argv[])
   int bin_N, *depth_bin, *reabs_bin, BR = 1, LA = 1, iterate;
   int reabsorptioncycles = 5; //number of loops over the reabsorption calculator: recommend 5
 
-  bin_N = 1e1;//laszlo recomends 1e5, but make sure bin size is << absorption length
-  depth_bin = ivector (1, bin_N);
-  reabs_bin = ivector (1, bin_N);
-  new_reabs_bin = dvector (1, bin_N);
 
 //AM1.5G data file has 1813
   input = fopen ("spectrum.txt", "r");
@@ -112,9 +108,10 @@ main (int argc, char *argv[])
 	exit(-1);
   }
   printf("%s\n",argv[1]);
+  bin_N = atoi(argv[1]);			//number of bins
+	//laszlo recomends 1e5, but make sure bin size is << absorption length
+  d = atof(argv[2]); //depth of the cell
 /*
-  bin_N = ;			//number of bins
-  d = ; //depth of the cell
   k1 = ;			//triplet nonradiative decay
   k2 = ;			//annihilation rate cm3/s 1.7e-13 for rubrene
   eta_c = ;			//proportion of annihilation events which lead to the singlet state
@@ -126,6 +123,11 @@ main (int argc, char *argv[])
   {
 	printf("%d\n",i);
   }
+  
+  //bin_N = 1e1;
+  depth_bin = ivector (1, bin_N);
+  reabs_bin = ivector (1, bin_N);
+  new_reabs_bin = dvector (1, bin_N);
 
   abs = 0;
   esc = 0;
@@ -151,7 +153,7 @@ main (int argc, char *argv[])
 
   N_phot = 1e4*bin_N;			//check me for convergence - recommend at least 10^4
   c = 1e-3;			//concentration of sensitizer
-  d = 0.0008;			//thickness in cm //only used if the for loop is disabled
+//  d = 0.0008;			//thickness in cm //only used if the for loop is disabled
   //do not define bin_N after you use it in ivector() bin_N = 5000;
   BR = 1;
   LA = 1;
@@ -161,7 +163,6 @@ main (int argc, char *argv[])
   T = 1.0;			//solar cell/front surface transparency
   k1 = 1e4;			//triplet nonradiative decay
   k2 = 1.7e-12;			//annihilation rate cm3/s 1.7e-13 for rubrene
-  d = 0.01; //depth of the cell
 
 
   //out_loop = fopen ("looper.dat", "w");
