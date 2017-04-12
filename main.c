@@ -19,7 +19,7 @@ main (int argc, char *argv[])
   FILE *out_incoming, *out_absorbed, *out_emitted, *out_detected, *out_depth;
     //*out_loop;
   //double x_dim, y_dim, z_dim;
-  const unsigned int commandlineargs=7; //including name of program
+  const unsigned int commandlineargs=8; //including name of program
   double *spec_x, *spec_y, *spec_y2;
   double *abs_x, *abs_y, *abs_y2;
   double *emi_x, *emi_y, *emi_y2;
@@ -111,20 +111,12 @@ main (int argc, char *argv[])
   bin_N = atoi(argv[1]);			//number of bins
 	//laszlo recomends 1e5, but make sure bin size is << absorption length
   d = atof(argv[2]); //depth of the cell
-/*
-  k1 = ;			//triplet nonradiative decay
-  k2 = ;			//annihilation rate cm3/s 1.7e-13 for rubrene
-  eta_c = ;			//proportion of annihilation events which lead to the singlet state
-  d = ;			//thickness in cm //only used if the for loop is disabled
-  c = ;			//concentration of sensitizer
-  C = ;			//solar concentration factor
-*/
-  for(i=1;i<=commandlineargs;i++)
-  {
-	printf("%d\n",i);
-  }
+  k1 = atof(argv[3]);			//triplet nonradiative decay
+  k2 = atof(argv[4]);			//annihilation rate cm3/s 1.7e-13 for rubrene
+  eta_c = atof(argv[5]);			//proportion of annihilation events which lead to the singlet state
+  c = atof(argv[6]);			//concentration of sensitizer
+  C = atof(argv[7]);			//solar concentration factor
   
-  //bin_N = 1e1;
   depth_bin = ivector (1, bin_N);
   reabs_bin = ivector (1, bin_N);
   new_reabs_bin = dvector (1, bin_N);
@@ -152,17 +144,17 @@ main (int argc, char *argv[])
 
 
   N_phot = 1e4*bin_N;			//check me for convergence - recommend at least 10^4
-  c = 1e-3;			//concentration of sensitizer
+  //c = 1e-3;			//concentration of sensitizer
 //  d = 0.0008;			//thickness in cm //only used if the for loop is disabled
   //do not define bin_N after you use it in ivector() bin_N = 5000;
   BR = 1;
   LA = 1;
   stokes = 0.0;			//don't use this
-  C = 1.0;			//solar concentration factor
-  eta_c = 1.0;			//proportion of annihilation events which lead to the singlet state
+  //C = 1.0;			//solar concentration factor
+  //eta_c = 1.0;			//proportion of annihilation events which lead to the singlet state
   T = 1.0;			//solar cell/front surface transparency
-  k1 = 1e4;			//triplet nonradiative decay
-  k2 = 1.7e-12;			//annihilation rate cm3/s 1.7e-13 for rubrene
+  //k1 = 1e4;			//triplet nonradiative decay
+  //k2 = 1.7e-12;			//annihilation rate cm3/s 1.7e-13 for rubrene
 
 
   //out_loop = fopen ("looper.dat", "w");
