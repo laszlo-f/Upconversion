@@ -104,10 +104,10 @@ main (int argc, char *argv[])
 //Get command line arguments
   if(argc!=commandlineargs)
   {//test number of arguments
-	printf("Wrong number of command line arguments\n");
+	printf("Wrong number of command line arguments: %d\n",argc);
 	exit(-1);
   }
-  printf("%s\n",argv[1]);
+  //printf("%s\n",argv[1]);
   bin_N = atoi(argv[1]);			//number of bins
 	//laszlo recomends 1e5, but make sure bin size is << absorption length
   d = atof(argv[2]); //depth of the cell
@@ -346,7 +346,9 @@ main (int argc, char *argv[])
 	  //printf ("External Quantum Efficiency is %1.4f out of 0.5000\n", esc / abs);
 
 	}			//end iterate
-      printf ("d is %1.4e, Emitted Current is %1.4e mAcm-2\n", d, esc / run_time * 1.602e-16);
+	//current, mAcm-2: bins: depth (cm): k1: k2: eta_c: sensitizer concentration: solar concentration factor
+      printf("%1.6e\t%d\t%1.6e\t%1.6e\t%1.6e\t%1.6e\t%1.6e\t%1.6e\n",  esc / run_time * 1.602e-16, bin_N,d,k1,k2,eta_c,c,C);
+  
       //fprintf (out_loop, "%1.4e\t%1.4e\n", d, esc / run_time * 1.602e-16);
     }				// end d loop
 
