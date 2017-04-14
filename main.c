@@ -15,32 +15,27 @@
 int
 main (int argc, char *argv[])
 {
-  FILE *input, *output;
-  FILE *out_incoming, *out_absorbed, *out_emitted, *out_detected, *out_depth;
-    //*out_loop;
-  //double x_dim, y_dim, z_dim;
-  const unsigned int commandlineargs=8; //including name of program
+
+//initialize variables
+  FILE *input;
+  const unsigned int commandlineargs=10; //including name of program
   double *spec_x, *spec_y, *spec_y2;
   double *abs_x, *abs_y, *abs_y2;
   double *emi_x, *emi_y, *emi_y2;
   double lambda, c, A1, A2;// ratio;
-  //double random, lambda, c, A1, A2;// ratio;
-  double stokes;// shift;
-  //double Phi_F, thresh, stokes;// shift;
   double d, z, dst;	//base calculations on a 1m2 concentrator
-  //double G, d, x, y, z, n, dst;	//base calculations on a 1m2 concentrator
   double total_energy = 0, run_time = 0;
   double dx, dy, dz, dr;
   double k1, k2, f2;		//cm3/s
   double k_phiS, NT, em, esc, C, eta_c, *new_reabs_bin, T;
 
-  int i, j, h, abs;// trp, wfg, 
-  int N_phot;// N_curr, W_curr;
-  long k = (short)time(NULL);//seed random number generator using the time
-	//printf("Random seed %ld\n",k);
+  double min_wavelength, max_wavelength;//define spectral window
 
-  //int reabs;
-  int spec_N, abs_N, emi_N;// alive, out, cheat;
+  int i, j, h, abs;
+  int N_phot;
+  long k = (short)time(NULL);//seed random number generator using the time
+
+  int spec_N, abs_N, emi_N;
   int bin_N, *depth_bin, *reabs_bin, BR = 1, LA = 1, iterate;
   int reabsorptioncycles = 5; //number of loops over the reabsorption calculator: recommend 5
 
@@ -57,7 +52,6 @@ main (int argc, char *argv[])
     {
       fscanf (input, "%lf", &spec_x[i]);
       fscanf (input, "%lf", &spec_y[i]);
-      //printf("%d\t%1.4f\t%1.3f\n",i,spec_x[i],spec_y[i]);
     }
   fclose (input);
 
@@ -75,7 +69,6 @@ main (int argc, char *argv[])
     {
       fscanf (input, "%lf", &abs_x[i]);
       fscanf (input, "%lf", &abs_y[i]);
-      //printf("%d\t%1.4f\t%1.3f\n",i,abs_x[i],abs_y[i]);
     }
   fclose (input);
 
@@ -94,7 +87,6 @@ main (int argc, char *argv[])
     {
       fscanf (input, "%lf", &emi_x[i]);
       fscanf (input, "%lf", &emi_y[i]);
-      //printf("%d\t%1.4f\t%1.3f\n",i,emi_x[i],emi_y[i]);
     }
   fclose (input);
 
@@ -107,7 +99,6 @@ main (int argc, char *argv[])
 	printf("Wrong number of command line arguments: %d\n",argc);
 	exit(-1);
   }
-  //printf("%s\n",argv[1]);
   bin_N = atoi(argv[1]);			//number of bins
 	//laszlo recomends 1e5, but make sure bin size is << absorption length
   d = atof(argv[2]); //depth of the cell
@@ -116,40 +107,22 @@ main (int argc, char *argv[])
   eta_c = atof(argv[5]);			//proportion of annihilation events which lead to the singlet state
   c = atof(argv[6]);			//concentration of sensitizer
   C = atof(argv[7]);			//solar concentration factor
+  min_wavelength = atof(argv[8]);			//short wavelength cutoff
+  max_wavelength = atof(argv[9]);			//long wavelength cutoff
   
   depth_bin = ivector (1, bin_N);
+  //do not define bin_N after you use it in ivector() bin_N = 5000;
   reabs_bin = ivector (1, bin_N);
   new_reabs_bin = dvector (1, bin_N);
 
   abs = 0;
   esc = 0;
-  //trp = 0;
-  //wfg = 0;
-  //reabs = 0;
   em = 0;
-  //N_curr = 0;
-  //W_curr = 0;
-
-  //cheat = 0;
-
-
-  output = fopen ("parameter.dat", "w");
-
-  out_incoming = fopen ("incoming.dat", "w");
-  out_absorbed = fopen ("absorbed.dat", "w");
-  out_emitted = fopen ("emitted.dat", "w");
-  out_detected = fopen ("detected.dat", "w");
-  out_depth = fopen ("depth.dat", "w");
-
 
 
   N_phot = 1e4*bin_N;			//check me for convergence - recommend at least 10^4
-  //c = 1e-3;			//concentration of sensitizer
-//  d = 0.0008;			//thickness in cm //only used if the for loop is disabled
-  //do not define bin_N after you use it in ivector() bin_N = 5000;
   BR = 1;
   LA = 1;
-  stokes = 0.0;			//don't use this
   //C = 1.0;			//solar concentration factor
   //eta_c = 1.0;			//proportion of annihilation events which lead to the singlet state
   T = 1.0;			//solar cell/front surface transparency
@@ -157,7 +130,6 @@ main (int argc, char *argv[])
   //k2 = 1.7e-12;			//annihilation rate cm3/s 1.7e-13 for rubrene
 
 
-  //out_loop = fopen ("looper.dat", "w");
   //
   //loop over depth
   //for (d = 0.0001; d <= .01; d *= 10)
@@ -170,15 +142,13 @@ main (int argc, char *argv[])
       for (i = 1; i <= N_phot; i++)	//number of incident photons
 	{
 	  splint (spec_x, spec_y, spec_y2, spec_N, ran1 (&k), &lambda);	//choose a wavelength
-	  //fprintf (out_incoming, "%1.1f\n", lambda);
 
-	  //printf("%1.1f\n",lambda);
 	  total_energy += 6.626e-34 * 2.9979e8 / lambda / 1e-9;
 
-	  if (lambda > 600.0 && lambda < 1300.0 && ran1 (&k) < T)	//transmitted to sample and absorbable
+	  if (lambda > min_wavelength && lambda < max_wavelength && ran1 (&k) < T)	//transmitted to sample and absorbable
 	    {
 	      splint (abs_x, abs_y, abs_y2, abs_N, lambda, &A1);	//get absorption coefficienct
-	      splint (abs_x, abs_y, abs_y2, abs_N, lambda - stokes, &A2);	//get absorption coefficienct
+	      splint (abs_x, abs_y, abs_y2, abs_N, lambda, &A2);	//get absorption coefficienct
 	      A1 = (A1 + A2) / 2;
 	      A1 *= c;		//concentration
 
@@ -187,8 +157,6 @@ main (int argc, char *argv[])
 	      if (z < d && z > 0.0)	//incoming photon is absorbed
 		{
 		  abs++;
-		  //fprintf (out_absorbed, "%1.1f\n", lambda);
-		  //printf("%1.1f is absorbed\n",lambda);
 
 		  j = z / d * bin_N + 1;
 		  depth_bin[j] += 1;
@@ -222,9 +190,6 @@ main (int argc, char *argv[])
 		  if (z > 0.0 && z < d && BR == 1)	//reabsorb off the back reflector
 		    {
 		      abs++;
-		      //fprintf (out_absorbed, "%1.1f\n", lambda);
-		      //printf("%1.1f is absorbed\n",lambda);
-		      //fprintf(out_depth,"%1.4e\n",z);
 		      j = z / d * bin_N + 1;
 		      depth_bin[j] += 1;
 		    }
@@ -233,29 +198,14 @@ main (int argc, char *argv[])
 	    }
 	}			//i
 
-      for (i = 1; i <= bin_N; i++)
-	{
-	  //fprintf (out_depth, "%d\t%d\n", i, depth_bin[i]);
-	}
+      
 
-      //printf ("Was that fun?\n");
       //printf ("total energy was %1.4e J\n", total_energy);
       //printf ("run time was therefore %1.4e s\n", run_time = total_energy / 100e-3 / C);
-      //
+
       //one sun is 100 mW/cm^2
       run_time = total_energy / 100e-3 / C;
 
-      //don't do assignments in print statements
-      //printf ("... so at front of cuvette, we absorbed photons at %1.4e cm-3s-1\n",
-	 //k_phiS = depth_bin[1] / run_time / (d / bin_N));
-	 k_phiS = depth_bin[1] / run_time / (d / bin_N);
-      //printf ("... triplet concentration is about %1.4e cm-3, which is about %1.4e M\n",
-	// NT = k_phiS / k1, k_phiS / k1 * 1000 / 6.022e23);
-
-      NT = (-k1 + sqrt (k1 * k1 + 4 * k_phiS * k2)) / 2 / k2;//not used?
-
-      //printf ("solving a quadratic,  we get that the triplet concentration at the front of the cuvette is %1.4e cm-3\n", NT);
-      //printf ("f2 at cuvette front is approximately %1.3e\n", k2 * NT / (k2 * NT + k1));
 
 //NOW GET A SELF CONSISTENT SOLUTION
 
@@ -284,9 +234,8 @@ main (int argc, char *argv[])
 	      for (j = 1; j <= depth_bin[i] + reabs_bin[i]; j++)
 		{
 		  splint (emi_x, emi_y, emi_y2, emi_N, ran1 (&k), &lambda);	//choose a wavelength
-		  //fprintf (out_emitted, "%1.1f\n", lambda);
 		  splint (abs_x, abs_y, abs_y2, abs_N, lambda, &A1);	//get absorption coefficienct
-		  splint (abs_x, abs_y, abs_y2, abs_N, lambda - stokes, &A2);	//get absorption coefficienct
+		  splint (abs_x, abs_y, abs_y2, abs_N, lambda, &A2);	//get absorption coefficienct
 		  A1 = (A1 + A2) / 2;
 		  A1 *= c;	//concentration
 
@@ -342,20 +291,13 @@ main (int argc, char *argv[])
 		}
 	    }
 
-//printf("*****\nInternal Quantum Efficiency is %1.4f out of 0.5000\n",em/abs);
-	  //printf ("External Quantum Efficiency is %1.4f out of 0.5000\n", esc / abs);
 
 	}			//end iterate
 	//current, mAcm-2: bins: depth (cm): k1: k2: eta_c: sensitizer concentration: solar concentration factor
-      printf("%1.6e\t%d\t%1.6e\t%1.6e\t%1.6e\t%1.6e\t%1.6e\t%1.6e\n",  esc / run_time * 1.602e-16, bin_N,d,k1,k2,eta_c,c,C);
+      printf("%1.6e\t%d\t%1.6e\t%1.6e\t%1.6e\t%1.6e\t%1.6e\t%1.6e\t%1.6e\t%1.6e\n",  esc / run_time * 1.602e-16, bin_N,d,k1,k2,eta_c,c,C,min_wavelength,max_wavelength);
   
-      //fprintf (out_loop, "%1.4e\t%1.4e\n", d, esc / run_time * 1.602e-16);
     }				// end d loop
 
-  fclose (output);
-  fclose (out_incoming);
-  fclose (out_absorbed);
-  fclose (out_emitted);
-  fclose (out_detected);
+
   return 0;
 }
