@@ -36,7 +36,9 @@ main (int argc, char *argv[])
   double total_energy = 0, run_time = 0;
   double dx, dy, dz, dr;
   double k1, k2, f2;		//cm3/s
-  double k_phiS, NT, em, esc, C, eta_c, *new_reabs_bin, T;
+  double k_phiS, NT, em, esc;//arithmetic helpers 
+  double  C;//solar concentration 
+  double eta_c;//proportion of triplet triplet annihilation events that produce a singlet 
 
   double min_wavelength, max_wavelength;//define spectral window
 
@@ -45,7 +47,11 @@ main (int argc, char *argv[])
   long k = (short)time(NULL);//seed random number generator using the time
 
   int spec_N, abs_N, emi_N;//number of items in data file
-  int bin_N, *depth_bin, *reabs_bin, BR = 1, LA = 1, iterate;
+  int bin_N, *depth_bin; 
+  double *reabs_bin, *new_reabs_bin;
+  const int BR = 1;//use back reflector 
+  const int  LA = 1; //if true use lambertian reflector, otherwise use specular
+  int iterate;
   int reabsorptioncycles = 5; //number of loops over the reabsorption calculator: recommend 5
 
 
@@ -121,7 +127,7 @@ main (int argc, char *argv[])
   
   depth_bin = ivector (1, bin_N);
   //do not define bin_N after you use it in ivector() bin_N = 5000;
-  reabs_bin = ivector (1, bin_N);
+  reabs_bin = dvector (1, bin_N);
   new_reabs_bin = dvector (1, bin_N);
 
   abs = 0;
@@ -130,9 +136,6 @@ main (int argc, char *argv[])
 
 
   N_phot = 1e4*bin_N;			//check me for convergence - recommend at least 10^4 bin_N
-  BR = 1;
-  LA = 1;
-  T = 1.0;			//solar cell/front surface transparency
 
 
       total_energy = 0.0;
@@ -146,10 +149,10 @@ main (int argc, char *argv[])
 
 	  total_energy += 6.626e-34 * 2.9979e8 / lambda / 1e-9;
 
-	  if (lambda > min_wavelength && lambda < max_wavelength && ran1 (&k) < T)	//transmitted to sample and absorbable
+	  if (lambda > min_wavelength && lambda < max_wavelength )	//test if photon is in the user selected window of the spectrum
 	    {
 	      splint (abs_x, abs_y, abs_y2, abs_N, lambda, &A1);	//get absorption coefficienct
-	      A1 *= c;		//concentration
+	      A1 *= c;		//solar concentration
 
 	      z = -1.0 * log (ran1 (&k)) / log (10.0) / A1;	//check to see if photon is absorbed
 
@@ -234,7 +237,7 @@ main (int argc, char *argv[])
 		{
 		  splint (emi_x, emi_y, emi_y2, emi_N, ran1 (&k), &lambda);	//choose a wavelength
 		  splint (abs_x, abs_y, abs_y2, abs_N, lambda, &A1);	//get absorption coefficienct
-		  A1 *= c;	//concentration
+		  A1 *= c;	//solar concentration
 
 		  dx = gasdev (&k);
 		  dy = gasdev (&k);
