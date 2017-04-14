@@ -19,10 +19,19 @@ main (int argc, char *argv[])
 //initialize variables
   FILE *input;
   const unsigned int commandlineargs=10; //including name of program
+
+//solar spectru
   double *spec_x, *spec_y, *spec_y2;
+
+//sensitizer absorption spectrum
   double *abs_x, *abs_y, *abs_y2;
+
+//emission spectrum
   double *emi_x, *emi_y, *emi_y2;
-  double lambda, c, A1, A2;// ratio;
+
+  double lambda;//random sample wavelength 
+  double c;//sensitizer concentration
+  double  A1; //interpolated absorption
   double d, z, dst;	//base calculations on a 1m2 concentrator
   double total_energy = 0, run_time = 0;
   double dx, dy, dz, dr;
@@ -35,7 +44,7 @@ main (int argc, char *argv[])
   int N_phot;
   long k = (short)time(NULL);//seed random number generator using the time
 
-  int spec_N, abs_N, emi_N;
+  int spec_N, abs_N, emi_N;//number of items in data file
   int bin_N, *depth_bin, *reabs_bin, BR = 1, LA = 1, iterate;
   int reabsorptioncycles = 5; //number of loops over the reabsorption calculator: recommend 5
 
@@ -120,20 +129,12 @@ main (int argc, char *argv[])
   em = 0;
 
 
-  N_phot = 1e4*bin_N;			//check me for convergence - recommend at least 10^4
+  N_phot = 1e4*bin_N;			//check me for convergence - recommend at least 10^4 bin_N
   BR = 1;
   LA = 1;
-  //C = 1.0;			//solar concentration factor
-  //eta_c = 1.0;			//proportion of annihilation events which lead to the singlet state
   T = 1.0;			//solar cell/front surface transparency
-  //k1 = 1e4;			//triplet nonradiative decay
-  //k2 = 1.7e-12;			//annihilation rate cm3/s 1.7e-13 for rubrene
 
 
-  //
-  //loop over depth
-  //for (d = 0.0001; d <= .01; d *= 10)
-    {
       total_energy = 0.0;
       for (i = 1; i <= bin_N; i++)
       {
@@ -148,8 +149,6 @@ main (int argc, char *argv[])
 	  if (lambda > min_wavelength && lambda < max_wavelength && ran1 (&k) < T)	//transmitted to sample and absorbable
 	    {
 	      splint (abs_x, abs_y, abs_y2, abs_N, lambda, &A1);	//get absorption coefficienct
-	      splint (abs_x, abs_y, abs_y2, abs_N, lambda, &A2);	//get absorption coefficienct
-	      A1 = (A1 + A2) / 2;
 	      A1 *= c;		//concentration
 
 	      z = -1.0 * log (ran1 (&k)) / log (10.0) / A1;	//check to see if photon is absorbed
@@ -235,8 +234,6 @@ main (int argc, char *argv[])
 		{
 		  splint (emi_x, emi_y, emi_y2, emi_N, ran1 (&k), &lambda);	//choose a wavelength
 		  splint (abs_x, abs_y, abs_y2, abs_N, lambda, &A1);	//get absorption coefficienct
-		  splint (abs_x, abs_y, abs_y2, abs_N, lambda, &A2);	//get absorption coefficienct
-		  A1 = (A1 + A2) / 2;
 		  A1 *= c;	//concentration
 
 		  dx = gasdev (&k);
@@ -296,7 +293,6 @@ main (int argc, char *argv[])
 	//current, mAcm-2: bins: depth (cm): k1: k2: eta_c: sensitizer concentration: solar concentration factor
       printf("%1.6e\t%d\t%1.6e\t%1.6e\t%1.6e\t%1.6e\t%1.6e\t%1.6e\t%1.6e\t%1.6e\n",  esc / run_time * 1.602e-16, bin_N,d,k1,k2,eta_c,c,C,min_wavelength,max_wavelength);
   
-    }				// end d loop
 
 
   return 0;
