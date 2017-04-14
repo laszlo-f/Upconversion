@@ -139,10 +139,14 @@ main (int argc, char *argv[])
 
 
       total_energy = 0.0;
-      for (i = 1; i <= bin_N; i++)
+
+      for (i = 1; i <= bin_N; i++)//initialize array
       {
 	  depth_bin[i] = 0;
+  reabs_bin[i]=0;
+  new_reabs_bin[i]=0;
 	}
+
       for (i = 1; i <= N_phot; i++)	//number of incident photons
 	{
 	  splint (spec_x, spec_y, spec_y2, spec_N, ran1 (&k), &lambda);	//choose a wavelength
