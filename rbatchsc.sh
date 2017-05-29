@@ -1,4 +1,6 @@
 #runs R script to generate a bunch of configurations, then runs simulation
+#supercomputer version
+#only runs one configuration based on the ARRAYID
 
 starttime=$(date +%d%m%H%M%S);
 echo "Current (mA/cm2)	bins	depth (cm)	k1	k2	eta_c	sensitizer concentration (M)	solar concentration factor	minwavelength	maxwavelength" > $starttime.out.dat
