@@ -75,6 +75,7 @@ main (int argc, char *argv[])
 
 	      dst = -1.0 * log (ran1 (&k)) / log (10.0) / (A1+emit_absorption);
 	      z = d - sqrt (dst * dz * dst * dz);	//increment z
+		//distance above the mirror that the photon was absorbed
 
 	      if (z > 0.0 && z < d && BR == 1)	//reabsorb off the back reflector
 		{
@@ -113,7 +114,7 @@ main (int argc, char *argv[])
 	  NT = (-k1 + sqrt (k1 * k1 + 4 * k_phiS * k2)) / 2 / k2;
 	  f2 = k2 * NT / (k2 * NT + k1);
 
-	  //propagate photons out
+	  //propagate photons produced by upconversion out
 	  for (j = 1; j <= depth_bin[i] + reabs_bin[i]; j++)
 	    {
 	      splint (emi_x, emi_y, emi_y2, emi_N, ran1 (&k), &lambda);	//choose a wavelength
@@ -133,7 +134,7 @@ main (int argc, char *argv[])
 	      dr = sqrt (dx * dx + dy * dy + dz * dz);
 	      dst = -1.0 * log (ran1 (&k)) / log (10.0) / (A1+emit_absorption); //beer-lambert law
 
-	      z = d * (1.0 * i - 0.5) / (1.0 * bin_N) + dz * dst;
+	      z = d * (1.0 * i - 0.5) / (1.0 * bin_N) + dz * dst;//how far the emitted photon travels
 
 	      if (z < 0.0)
 		{		//if we escaped
@@ -170,6 +171,7 @@ main (int argc, char *argv[])
 		  dst = -1.0 * log (ran1 (&k)) / log (10.0) /(A1+emit_absorption);
 
 		  z = d - sqrt (dst * dz * dst * dz);	//increment z
+		// distance the photon travels from the mirror.  It starts at the mirror because we know it wasn't absorbed on the back side of the mirror
 		  if (z < 0.0)
 		    {		//if we escaped
 		      if (lambda < min_wavelength)
@@ -186,6 +188,85 @@ main (int argc, char *argv[])
                   	} else {
                       		//photon was absorbed by emitter, singlet is excited
                   		new_singlet_bin[h]+= eta_c * f2 * 0.5;
+			}
+                    }           //reabsorption and escapage is fractional photons, more efficient that way for calcualtion
+		}
+	    }
+
+//propagate photons from sensitizer emission out
+	  for (j = 1; j <= singlet_bin[i]; j++){
+	      splint (emi_x, emi_y, emi_y2, emi_N, ran1 (&k), &lambda);	//choose a wavelength
+	      splint (abs_x, abs_y, abs_y2, abs_N, lambda, &A1);	//get absorption coefficienct
+	      splint (emit_abs_x, emit_abs_y, emit_abs_y2, emit_abs_N, lambda, &emit_absorption); //get absorption coefficient
+	      A1 *= c;		//sensitizer concentration
+	      emit_absorption *= emit_concentration;
+
+	      dx = gasdev (&k);
+	      dy = gasdev (&k);
+	      dz = gasdev (&k);
+
+	      dr = sqrt (dx * dx + dy * dy + dz * dz);
+	      dx = dx / dr;
+	      dy = dy / dr;
+	      dz = dz / dr;
+	      dr = sqrt (dx * dx + dy * dy + dz * dz);
+	      dst = -1.0 * log (ran1 (&k)) / log (10.0) / (A1+emit_absorption); //beer-lambert law
+
+	      z = d * (1.0 * i - 0.5) / (1.0 * bin_N) + dz * dst;
+
+	      if (z < 0.0)
+		{		//if we escaped
+		  if (lambda < min_wavelength)
+		    {		//photon energy must be absorbed by solar cell
+		      esc += 1;
+		    }
+		}
+	      else if (z < d)
+		{
+		  h = z / d * bin_N + 1;//which bin did absorption occur in?  cast float to int
+			if(ran1(&k)>(emit_absorption/(A1+emit_absorption))){
+		  		new_reabs_bin[h] += 1;
+			 } else {
+				new_singlet_bin[h]+= 1;
+			}
+		}
+
+	      if (z > d && BR == 1)//reflected emission 
+		{
+		  if (LA == 1)
+		    {
+		      dx = gasdev (&k);
+		      dy = gasdev (&k);
+		      dz = gasdev (&k);
+
+		      dr = sqrt (dx * dx + dy * dy + dz * dz);
+		      dx = dx / dr;
+		      dy = dy / dr;
+		      dz = dz / dr;
+		      dr = sqrt (dx * dx + dy * dy + dz * dz);
+		    }
+
+		  dst = -1.0 * log (ran1 (&k)) / log (10.0) /(A1+emit_absorption);
+
+		  z = d - sqrt (dst * dz * dst * dz);	//increment z
+		//distance above the mirror that the photon was absorbed
+
+		  if (z < 0.0)
+		    {		//if we escaped
+		      if (lambda < min_wavelength)
+			{	//photon energy must be absorbed by solar cell
+			  esc += eta_c * f2 * 0.5;
+			}
+		    }
+		  else
+		    {
+		      h = z / d * bin_N + 1;
+			if(ran1(&k)>(emit_absorption/(A1+emit_absorption))){
+                    		  //photon was absorbed by sensitizer
+                      		new_reabs_bin[h] += 1;
+                  	} else {
+                      		//photon was absorbed by emitter, singlet is excited
+                  		new_singlet_bin[h]+= 1;
 			}
                     }           //reabsorption and escapage is fractional photons, more efficient that way for calcualtion
 		}
