@@ -16,7 +16,7 @@
   spline (spec_x, spec_y, spec_N, 1e30, 1e30, spec_y2);
 //end set up solar spectrum
 
-//set up absorption spectrum
+//set up absorption spectrum of sensitizer
   input = fopen ("absorption.txt", "r");
   fscanf (input, "%d\n", &abs_N);
   abs_x = dvector (1, abs_N);
@@ -29,9 +29,24 @@
       fscanf (input, "%lf", &abs_y[i]);
     }
   fclose (input);
-
   spline (abs_x, abs_y, abs_N, 1e30, 1e30, abs_y2);
 //end set up absorption spectrum
+  
+ //read emitter's absorption spectrum 
+  input = fopen ("emitter_absorption.txt", "r");
+  fscanf (input, "%d\n", &emit_abs_N);
+  emit_abs_x = dvector (1, emit_abs_N);
+  emit_abs_y = dvector (1, emit_abs_N);
+  emit_abs_y2 = dvector (1, emit_abs_N);
+  for (i = 1; i <= abs_N; i++)
+    {
+      fscanf (input, "%lf", &emit_abs_x[i]);
+      fscanf (input, "%lf", &emit_abs_y[i]);
+    }
+  fclose (input);
+  spline (emit_abs_x, emit_abs_y, emit_abs_N, 1e30, 1e30, emit_abs_y2);
+  //end read emitter's absorption spectrum
+
 
 
 //set up emission spectrum
@@ -64,12 +79,16 @@
   k2 = atof(argv[4]);			//annihilation rate cm3/s 1.7e-13 for rubrene
   eta_c = atof(argv[5]);			//proportion of annihilation events which lead to the singlet state
   c = atof(argv[6]);			//concentration of sensitizer
-  C = atof(argv[7]);			//solar concentration factor
-  min_wavelength = atof(argv[8]);			//short wavelength cutoff
-  max_wavelength = atof(argv[9]);			//long wavelength cutoff
+  emit_concentration = atof(argv[7]);
+  C = atof(argv[8]);			//solar concentration factor
+  min_wavelength = atof(argv[9]);			//short wavelength cutoff
+  max_wavelength = atof(argv[10]);			//long wavelength cutoff
   
   depth_bin = ivector (1, bin_N);
+  singlet_depth_bin = ivector (1, bin_N);
   //do not define bin_N after you use it in ivector() bin_N = 5000;
   reabs_bin = dvector (1, bin_N);
   new_reabs_bin = dvector (1, bin_N);
+  singlet_bin = dvector (1, bin_N);
+  new_singlet_bin = dvector (1, bin_N);
 
