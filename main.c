@@ -193,7 +193,7 @@ main (int argc, char *argv[])
 		}
 	    }
 
-//propagate photons from sensitizer emission out
+//propagate photons from sensitizer absorption-emission out
 	  for (j = 1; j <= singlet_bin[i]; j++){
 	      splint (emi_x, emi_y, emi_y2, emi_N, ran1 (&k), &lambda);	//choose a wavelength
 	      splint (abs_x, abs_y, abs_y2, abs_N, lambda, &A1);	//get absorption coefficienct
