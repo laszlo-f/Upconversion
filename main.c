@@ -257,8 +257,11 @@ main (int argc, char *argv[])
 
 		  z = d * (1.0 * i - 0.5) / (1.0 * bin_N) + dz * dst;
 
-		  if (z < 0.0)
-		    esc += eta_c * f2 * 0.5;
+		  if (z < 0.0) {//if we escaped
+			  if(lambda < min_wavelength){ //photon energy must be absorbed by solar cell
+		    		esc += eta_c * f2 * 0.5;
+			  }
+		  }
 		  else if (z < d)
 		    {
 		      h = z / d * bin_N + 1;
@@ -283,8 +286,11 @@ main (int argc, char *argv[])
 		      dst = -1.0 * log (ran1 (&k)) / log (10.0) / A1;
 
 		      z = d - sqrt (dst * dz * dst * dz);	//increment z
-		      if (z < 0.0)
-			esc += eta_c * f2 * 0.5;
+		      if (z < 0.0) {//if we escaped
+			  if(lambda < min_wavelength){ //photon energy must be absorbed by solar cell
+				esc += eta_c * f2 * 0.5;
+			  }
+		      }
 		      else
 			{
 			  h = z / d * bin_N + 1;
