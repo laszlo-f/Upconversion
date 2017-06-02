@@ -3,7 +3,7 @@
 #only runs one configuration based on the ARRAYID
 
 starttime=$(date +%d%m%H%M%S);
-echo "Current (mA/cm2)	bins	depth (cm)	k1	k2	eta_c	sensitizer concentration (M)	solar concentration factor	minwavelength	maxwavelength" > $starttime.out.dat
+echo "Current (mA/cm2)	bins	depth (cm)	k1	k2	eta_c	sensitizer concentration (M)	emitter concentration (M)	solar concentration factor	minwavelength	maxwavelength" > $starttime.out.dat
 
 #unnecessary loop goes over the row selected by PBS_ARRAYID
 while read p; do

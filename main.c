@@ -275,8 +275,8 @@ main (int argc, char *argv[])
     }				//end iterate
   //current, mAcm-2: bins: depth (cm): k1: k2: eta_c: sensitizer concentration: solar concentration factor
   printf
-    ("%1.6e\t%d\t%1.6e\t%1.6e\t%1.6e\t%1.6e\t%1.6e\t%1.6e\t%1.6e\t%1.6e\n",
-     esc / run_time * 1.602e-16, bin_N, d, k1, k2, eta_c, c, C,
+    ("%1.6e\t%d\t%1.6e\t%1.6e\t%1.6e\t%1.6e\t%1.6e\t%1.6e\t%1.6e\t%1.6e\t%1.6e\n",
+     esc / run_time * 1.602e-16, bin_N, d, k1, k2, eta_c, c, emit_concentration,  C,
      min_wavelength, max_wavelength);
   return 0;
 }
