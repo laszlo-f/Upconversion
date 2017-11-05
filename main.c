@@ -38,6 +38,8 @@ main (int argc, char *argv[])
 	{
 	  splint (abs_x, abs_y, abs_y2, abs_N, lambda, &A1);	//get absorption coefficienct
 	  splint (emit_abs_x, emit_abs_y, emit_abs_y2, emit_abs_N, lambda, &emit_absorption);	//get absorption coefficienct
+	  A1 = fabs(A1); //eliminate negative values caused by noise
+	  emit_absorption = fabs(emit_absorption); //eliminate negative values caused by noise
 	  A1 *= c;		//sensitizer concentration
 	  emit_absorption *= emit_concentration;
 
@@ -120,6 +122,8 @@ main (int argc, char *argv[])
 	      splint (emi_x, emi_y, emi_y2, emi_N, ran1 (&k), &lambda);	//choose a wavelength
 	      splint (abs_x, abs_y, abs_y2, abs_N, lambda, &A1);	//get absorption coefficienct
 	      splint (emit_abs_x, emit_abs_y, emit_abs_y2, emit_abs_N, lambda, &emit_absorption); //get absorption coefficient
+	      A1 = fabs(A1); //eliminate negative values caused by noise
+	      emit_absorption = fabs(emit_absorption); //eliminate negative values caused by noise
 	      A1 *= c;		//sensitizer concentration
 	      emit_absorption *= emit_concentration;
 
@@ -198,6 +202,8 @@ main (int argc, char *argv[])
 	      splint (emi_x, emi_y, emi_y2, emi_N, ran1 (&k), &lambda);	//choose a wavelength
 	      splint (abs_x, abs_y, abs_y2, abs_N, lambda, &A1);	//get absorption coefficienct
 	      splint (emit_abs_x, emit_abs_y, emit_abs_y2, emit_abs_N, lambda, &emit_absorption); //get absorption coefficient
+	      A1 = fabs(A1); //eliminate negative values caused by noise
+	      emit_absorption = fabs(emit_absorption); //eliminate negative values caused by noise
 	      A1 *= c;		//sensitizer concentration
 	      emit_absorption *= emit_concentration;
 
