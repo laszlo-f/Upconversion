@@ -17,6 +17,8 @@
 //end set up solar spectrum
 
 //set up absorption spectrum of sensitizer
+//first line is the number of wavelengths
+//must be sorted by increasing wavelength
   input = fopen ("absorption.txt", "r");
   fscanf (input, "%d\n", &abs_N);
   abs_x = dvector (1, abs_N);
@@ -32,6 +34,8 @@
   spline (abs_x, abs_y, abs_N, 1e30, 1e30, abs_y2);
 //end set up absorption spectrum
   
+//first line is the number of wavelengths
+//must be sorted by increasing wavelength
  //read emitter's absorption spectrum 
   input = fopen ("emitter_absorption.txt", "r");
   fscanf (input, "%d\n", &emit_abs_N);
