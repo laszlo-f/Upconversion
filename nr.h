@@ -199,7 +199,7 @@ float gamdev(int ia, long *idum);
 float gammln(float xx);
 float gammp(float a, float x);
 float gammq(float a, float x);
-double gasdev(long *idum);
+double gasdev();
 void gaucof(int n, float a[], float b[], float amu0, float x[], float w[]);
 void gauher(float x[], float w[], int n);
 void gaujac(float x[], float w[], int n, float alf, float bet);

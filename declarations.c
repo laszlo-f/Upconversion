@@ -31,7 +31,7 @@
 
   int i, j, h;
   int N_phot;
-  
+
   srand(time(NULL));//seed random number generator using the time
 
   int spec_N, abs_N, emi_N, emit_abs_N;//number of items in data file
