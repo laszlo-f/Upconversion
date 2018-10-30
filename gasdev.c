@@ -2,7 +2,7 @@
 
 double gasdev(long *idum)
 {
-	double ran1(long *idum);
+	double ran1();
 	static int iset=0;
 	static double gset;
 	float fac,rsq,v1,v2;

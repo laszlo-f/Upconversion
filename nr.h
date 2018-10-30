@@ -375,7 +375,7 @@ void quadct(float x, float y, float xx[], float yy[], unsigned long nn,
 void quadmx(float **a, int n);
 void quadvl(float x, float y, float *fa, float *fb, float *fc, float *fd);
 float ran0(long *idum);
-double ran1(long *idum);
+double ran1();
 float ran2(long *idum);
 float ran3(long *idum);
 float ran4(long *idum);
