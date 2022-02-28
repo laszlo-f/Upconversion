@@ -30,6 +30,8 @@
       fscanf (input, "%lf", &abs_x[i]);
       fscanf (input, "%lf", &abs_y[i]);
     }
+  min_absorption=abs_x[1];
+  max_absorption=abs_x[abs_N];
   fclose (input);
   spline (abs_x, abs_y, abs_N, 1e30, 1e30, abs_y2);
 //end set up absorption spectrum
@@ -42,11 +44,13 @@
   emit_abs_x = dvector (1, emit_abs_N);
   emit_abs_y = dvector (1, emit_abs_N);
   emit_abs_y2 = dvector (1, emit_abs_N);
-  for (i = 1; i <= abs_N; i++)
+  for (i = 1; i <= emit_abs_N; i++)
     {
       fscanf (input, "%lf", &emit_abs_x[i]);
       fscanf (input, "%lf", &emit_abs_y[i]);
     }
+  min_emitter_absorption=emit_abs_x[1];
+  max_emitter_absorption=emit_abs_x[emit_abs_N];
   fclose (input);
   spline (emit_abs_x, emit_abs_y, emit_abs_N, 1e30, 1e30, emit_abs_y2);
   //end read emitter's absorption spectrum
@@ -65,6 +69,8 @@
       fscanf (input, "%lf", &emi_x[i]);
       fscanf (input, "%lf", &emi_y[i]);
     }
+  min_emission=emi_y[1];
+  max_emission=emi_y[emi_N];
   fclose (input);
 
   spline (emi_x, emi_y, emi_N, 1e30, 1e30, emi_y2);
@@ -86,7 +92,11 @@
   emit_concentration = atof(argv[7]);
   C = atof(argv[8]);			//solar concentration factor
   min_wavelength = atof(argv[9]);			//short wavelength cutoff
-  max_wavelength = atof(argv[10]);			//long wavelength cutoff
+
+  sctA = atof(argv[10]);//(eV^1/2) product of thickness of solar cell(m) and square root of proportionality constant A from Tauc model
+  //determines strength of solar cell absorption
+  delta_E = atof(argv[11]); //energy difference between the sensitizer triplet and the emitter triplet. Typically between 0.3 and -0.1 eV.
+  temperature = atof(argv[12]); //usually 300 K.
   
   depth_bin = ivector (1, bin_N);
   singlet_depth_bin = ivector (1, bin_N);
